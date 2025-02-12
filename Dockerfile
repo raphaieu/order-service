@@ -20,23 +20,17 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Instala dependências do Laravel
 RUN composer install && chmod -R 777 storage bootstrap/cache
 
-# Garante que o arquivo do banco SQLite exista e tenha permissões corretas
+# Cria o banco SQLite
 RUN mkdir -p database && touch database/database.sqlite && chmod 777 database/database.sqlite
-
-# Expõe a porta do Apache
-EXPOSE 80
 
 # Habilitar mod_rewrite no Apache
 RUN a2enmod rewrite
 
 # Permitir que .htaccess sobrescreva as configurações do Apache
 RUN sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
-
-# Corrige a raiz do Apache para `public/`
 RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
 
-# Corrige permissões de arquivos
-RUN chown -R www-data:www-data /var/www/html
+# Expõe a porta do Apache
+EXPOSE 80
 
-# Comando de inicialização
 CMD ["apache2-foreground"]

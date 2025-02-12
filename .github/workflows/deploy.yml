@@ -27,8 +27,10 @@ jobs:
             git pull origin main
             docker-compose down
             docker-compose up -d --build
-            php artisan migrate --force
-            php artisan cache:clear
-            php artisan config:clear
+            docker exec order_service_laravel cp database/database.sqlite database/database-backup.sqlite
+            docker exec order_service_laravel php artisan key:generate
+            docker exec order_service_laravel php artisan migrate --no-interaction --force
+            docker exec order_service_laravel php artisan cache:clear
+            docker exec order_service_laravel php artisan config:clear
             exit
           EOF
